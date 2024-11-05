@@ -1,8 +1,20 @@
 "use client"
-import { Line, Bar } from '@ant-design/charts';
 import { Radio, Typography } from 'antd';
 import { DatePicker, Layout, Menu } from 'antd';
 import { useState } from "react";
+import footballCsv from '../data/football.csv'
+import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, Rectangle } from 'recharts'
+import dayjs from 'dayjs'
+
+
+const d = footballCsv.slice(-200).map(([m, v]) => [dayjs(m).format('DD/MM/YYYY'), v])
+const meanD = footballCsv.reduce((totalValue, footballItem) => totalValue + Number(footballItem[1]), 0) / footballCsv.length
+
+
+
+
+
+
 
 const { Content, Sider } = Layout;
 const { Title } = Typography
@@ -28,32 +40,28 @@ const ROUTES = [
   }
 ]
 
+const CustomBar = (props) => {
+  const { value } = props;
+
+  let fill
+
+  if (Number(value) < meanD) {
+    fill = '#FF7777'
+  } else {
+    fill = '#399918'
+  }
+
+
+  //use explicit fill here, or use the additional css class and make a css selector to update fill there
+  return <Rectangle {...props} fill={fill} />
+};
+
 export default function Home() {
   const [dateRange, setDateRange] = useState<[Date, Date]>()
   const [dataType, setDataType] = useState<DataType>(DataType.RAW)
 
-  const data = [
-    { year: '1991', value: 3 },
-    { year: '1992', value: 4 },
-    { year: '1993', value: 3.5 },
-    { year: '1994', value: 5 },
-    { year: '1995', value: 4.9 },
-    { year: '1996', value: 6 },
-    { year: '1997', value: 7 },
-    { year: '1998', value: 9 },
-    { year: '1999', value: 13 },
-  ];
-
-  const config = {
-    data,
-    height: 400,
-    xField: 'year',
-    yField: 'value',
-  };
-
-
   return (
-    <Layout className='p-5 min-h-screen'>
+    <Layout className='p-7 min-h-screen'>
       <Sider width={200} className="mr-5">
         <Menu
           mode="inline"
@@ -62,7 +70,6 @@ export default function Home() {
           style={{ height: '100%' }}
           items={ROUTES}
         />
-
       </Sider>
 
       <Content>
@@ -71,11 +78,17 @@ export default function Home() {
           <Radio.Group options={DATA_TYPE_OPTIONS} onChange={e => setDataType(e.target.value)} value={dataType} optionType="button" />
         </div>
 
-        <Title level={2}>Daily Values:</Title>
-        <Bar {...config} className="mb-10" />
+        <div className='mb-10'>
+          <Title level={2}>Daily Values:</Title>
+          <BarChart width={1000} height={1000} data={d}>
+            <XAxis dataKey={x => x[0]} />
+            <YAxis dataKey={x => x[1]} />
+            <Bar shape={CustomBar} dataKey={x => x[1]} />
+            <Tooltip />
+          </BarChart>
+        </div>
 
         <Title level={2}>Trends:</Title>
-        <Line {...config} />
       </Content>
 
     </Layout>
