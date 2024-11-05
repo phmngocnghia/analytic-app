@@ -4,7 +4,7 @@ import { Radio, Typography } from 'antd';
 import { DatePicker, Layout, Menu } from 'antd';
 import { useState } from "react";
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Content, Sider } = Layout;
 const { Title } = Typography
 
 
