@@ -4,10 +4,11 @@ import { DatePicker, Layout, Menu } from 'antd';
 import { useMemo, useState } from "react";
 import footballCsv from '../data/football.csv'
 import dayjs, { Dayjs } from 'dayjs'
-import { CustomizedBarChart } from '@/components/CustomBarChart';
+import { CustomizedBarChart } from '@/app/components/CustomBarChart';
 import { toPercentage } from '@/utils';
-import { CustomLineChart } from '@/components/CustomLineChart';
+import { CustomLineChart } from '@/app/components/CustomLineChart';
 import dayjsIsBetween from 'dayjs/plugin/isBetween'
+import Link from 'next/link'
 
 dayjs.extend(dayjsIsBetween)
 
@@ -29,9 +30,9 @@ const DATA_TYPE_OPTIONS = [
 
 const ROUTES = [
   {
-    label: 'Home'
+    label: <Link href="/">Home</Link>
   }, {
-    label: 'Map'
+    label: <Link href="/map">Map</Link>
   }
 ]
 
