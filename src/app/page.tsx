@@ -5,14 +5,15 @@ import { useState } from "react";
 import footballCsv from '../data/football.csv'
 import { CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, Rectangle, LineChart, CartesianGridProps, Line } from 'recharts'
 import dayjs from 'dayjs'
-import { CustomizedBarChart } from '@/components/BarChart';
+import { CustomizedBarChart } from '@/components/CustomBarChart';
 import { toPercentage } from '@/utils';
+import { CustomLineChart } from '@/components/CustomLineChart';
 
 
 const yearlyMeanValue = 600
 const d = footballCsv.slice(-200).map((footballItem) => {
   return {
-    time: dayjs(footballItem.Time).format('DD/MM/YYYY'), value: footballItem.Value, lineGreenValue: footballItem.Value >= yearlyMeanValue ? footballItem.Value : undefined, lineRedValue: footballItem.Value < yearlyMeanValue ? footballItem.Value : undefined
+    time: dayjs(footballItem.Time).format('DD/MM/YYYY'), value: footballItem.Value, lineRedValue: footballItem.Value < yearlyMeanValue ? footballItem.Value : undefined
   }
 })
 
@@ -131,14 +132,7 @@ export default function Home() {
         </div>
 
         <Title level={2}>Trends:</Title>
-        <LineChart width={1000} height={500} data={d}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          <XAxis dataKey={x => x.time} />
-          <YAxis dataKey={x => x.value} />
-          <Tooltip />
-          <Line dataKey={x => x.value} stroke={'#399918'} isAnimationActive={false} />
-          <Line dataKey={x => x.lineRedValue} stroke={'#FF7777'} isAnimationActive={false} />
-        </LineChart>
+        <CustomLineChart data={d} />
 
       </Content>
 

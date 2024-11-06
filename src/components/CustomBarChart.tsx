@@ -1,15 +1,18 @@
-import { Tooltip } from "recharts";
+import { COLOR } from "@/constants";
+import { FootballItem } from "@/types";
+import { BarProps, RectangleProps, Tooltip } from "recharts";
 import { CartesianGrid, XAxis, YAxis, Legend, Bar, Rectangle, LineChart, CartesianGridProps, Line, BarChart } from 'recharts'
+import { ActiveShape } from "recharts/types/util/types";
 
-const createCustomBar = (yearlyMeanValue) => (props) => {
+const createCustomBar = (yearlyMeanValue: number) => (props: RectangleProps) => {
   const { value } = props;
 
   let fill
 
   if (Number(value) < yearlyMeanValue) {
-    fill = '#FF7777'
+    fill = COLOR.RED
   } else {
-    fill = '#399918'
+    fill = COLOR.GREEN
   }
 
 
@@ -17,8 +20,7 @@ const createCustomBar = (yearlyMeanValue) => (props) => {
   return <Rectangle {...props} fill={fill} />
 };
 
-export const CustomizedBarChart = ({ data, yearlyMeanValue }) => {
-
+export const CustomizedBarChart = ({ data, yearlyMeanValue }: { data: FootballItem[], yearlyMeanValue: number }) => {
   const CustomBar = createCustomBar(yearlyMeanValue)
 
   return (<BarChart width={1000} height={500} data={data}>
