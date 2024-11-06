@@ -12,16 +12,6 @@ import dayjsIsBetween from 'dayjs/plugin/isBetween'
 dayjs.extend(dayjsIsBetween)
 
 
-const yearlyMeanValue = 600
-
-
-
-
-const d = footballCsv.slice(-200).map((footballItem) => {
-  return {
-    time: dayjs(footballItem.Time).format('DD/MM/YYYY'), value: footballItem.Value, lineRedValue: footballItem.Value < yearlyMeanValue ? footballItem.Value : undefined
-  }
-})
 
 // const maxValue = d.reduce(function (curMax, current) {
 
@@ -108,10 +98,25 @@ console.log('demo', dayjs().startOf('M'));
 
 export default function Home() {
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([dayjs().set('y', 2021).startOf('y'), dayjs().set('y', 2021).endOf('y')])
-  console.log({ dateRange });
 
   const [dataType, setDataType] = useState<DataType>(DataType.RAW)
   const [data, setData] = useState()
+
+  const yearlyAverage = useMemo(() => {
+    // in case user selects time range more than 2 years. e.g: filter time from 2020 -> 2021
+    const yearToFilters = [...new Set([dateRange[0].get('year'), dateRange[1].get('year')])]
+
+
+    const yearlyItems = footballCsv.filter(footbalItem => {
+      const footballItemYear = dayjs(footbalItem.Time).get('y')
+      return yearToFilters.includes(footballItemYear)
+    })
+
+    const yearlyItemsTotal = yearlyItems.reduce((totalValue, footballItem) => totalValue + Number(footballItem.Value), 0)
+    const yearlyAverage = yearlyItemsTotal / yearlyItems.length
+    return yearlyAverage
+  }, [])
+
 
 
   const filteredData = useMemo(() => {
@@ -119,7 +124,7 @@ export default function Home() {
       return dayjs(footballItem.Time).isBetween(dateRange[0], dateRange[1])
     }).map((footballItem) => {
       return {
-        time: dayjs(footballItem.Time).format('DD/MM/YYYY'), value: footballItem.Value, lineRedValue: footballItem.Value < yearlyMeanValue ? footballItem.Value : undefined
+        time: dayjs(footballItem.Time).format('DD/MM/YYYY'), value: footballItem.Value, lineRedValue: footballItem.Value < yearlyAverage ? footballItem.Value : undefined
       }
     })
   }, [dateRange])
@@ -149,7 +154,7 @@ export default function Home() {
 
         <div className='mb-10'>
           <Title level={2}>Daily Values:</Title>
-          <CustomizedBarChart yearlyMeanValue={yearlyMeanValue} data={filteredData} />
+          <CustomizedBarChart yearlyMeanValue={yearlyAverage} data={filteredData} />
         </div>
 
         <Title level={2}>Trends:</Title>
