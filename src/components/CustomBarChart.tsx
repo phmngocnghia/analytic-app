@@ -24,10 +24,9 @@ export const CustomizedBarChart = ({ data, yearlyMeanValue }: { data: FootballIt
   const CustomBar = createCustomBar(yearlyMeanValue)
 
   return (<BarChart width={1000} height={500} data={data}>
-    <XAxis dataKey={x => x.time} />
-    <YAxis dataKey={x => x.value} type="number" allowDataOverflow /> />
+    <XAxis label="Percent" dataKey={x => x.time} />
+    <YAxis label="Time" dataKey={x => x.value} type="number" allowDataOverflow /> />
     <Bar shape={CustomBar} dataKey={x => x.value} />
-    <Legend />
     <Tooltip />
   </BarChart >)
 }
