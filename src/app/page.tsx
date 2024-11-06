@@ -1,34 +1,37 @@
 "use client"
 import { Radio, Typography } from 'antd';
 import { DatePicker, Layout, Menu } from 'antd';
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import footballCsv from '../data/football.csv'
-import { CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, Rectangle, LineChart, CartesianGridProps, Line } from 'recharts'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { CustomizedBarChart } from '@/components/CustomBarChart';
 import { toPercentage } from '@/utils';
 import { CustomLineChart } from '@/components/CustomLineChart';
+import dayjsIsBetween from 'dayjs/plugin/isBetween'
+
+dayjs.extend(dayjsIsBetween)
 
 
 const yearlyMeanValue = 600
+
+
+
+
 const d = footballCsv.slice(-200).map((footballItem) => {
   return {
     time: dayjs(footballItem.Time).format('DD/MM/YYYY'), value: footballItem.Value, lineRedValue: footballItem.Value < yearlyMeanValue ? footballItem.Value : undefined
   }
 })
 
+// const maxValue = d.reduce(function (curMax, current) {
+
+//   return (curMax > current.value) ? curMax : current.value
+// }, 0)
 
 
 
-const max = d.reduce(function (curMax, current) {
-
-  return (curMax > current.value) ? curMax : current.value
-}, 0)
-
-
-
-const normalizedD = d.map(d => ({ time: d.time, value: toPercentage(d.value, max) }))
-const yearlyMeanPercent = toPercentage(yearlyMeanValue, max)
+// const normalizedD = d.map(d => ({ time: d.time, value: toPercentage(d.value, max) }))
+// const yearlyMeanPercent = toPercentage(yearlyMeanValue, max)
 // // const yearlyMeanValue = footballCsv.reduce((totalValue, footballItem) => totalValue + Number(footballItem[1]), 0) / footballCsv.length
 
 
@@ -101,10 +104,28 @@ const ROUTES = [
 
 
 
+console.log('demo', dayjs().startOf('M'));
+
 export default function Home() {
-  const [dateRange, setDateRange] = useState<[Date, Date]>()
+  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([dayjs().set('y', 2021).startOf('y'), dayjs().set('y', 2021).endOf('y')])
+  console.log({ dateRange });
+
   const [dataType, setDataType] = useState<DataType>(DataType.RAW)
   const [data, setData] = useState()
+
+
+  const filteredData = useMemo(() => {
+    return footballCsv.filter((footballItem) => {
+      return dayjs(footballItem.Time).isBetween(dateRange[0], dateRange[1])
+    }).map((footballItem) => {
+      return {
+        time: dayjs(footballItem.Time).format('DD/MM/YYYY'), value: footballItem.Value, lineRedValue: footballItem.Value < yearlyMeanValue ? footballItem.Value : undefined
+      }
+    })
+  }, [dateRange])
+
+
+
 
 
 
@@ -128,11 +149,11 @@ export default function Home() {
 
         <div className='mb-10'>
           <Title level={2}>Daily Values:</Title>
-          <CustomizedBarChart yearlyMeanValue={yearlyMeanValue} data={d} />
+          <CustomizedBarChart yearlyMeanValue={yearlyMeanValue} data={filteredData} />
         </div>
 
         <Title level={2}>Trends:</Title>
-        <CustomLineChart data={d} />
+        <CustomLineChart data={filteredData} />
 
       </Content>
 
