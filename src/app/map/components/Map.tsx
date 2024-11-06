@@ -1,12 +1,11 @@
 
 "use client"
 
-import mapData from '../data/office_geojson.json'
+import type { GeoJsonObject } from 'geojson';
+import mapData from '../../../data/office_geojson.json'
 import "leaflet/dist/leaflet.css";
 import { GeoJSON, MapContainer, Marker, TileLayer } from 'react-leaflet'
-import { useEffect, useRef } from 'react';
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
-import '../app/globals.css'
 
 const centerPosition = new L.LatLng(
   48.115969,
@@ -26,13 +25,13 @@ const labels = mapData.features.map(f => {
 
 export default function MapWrapper() {
   return (
-    <MapContainer style={{ height: '100vh' }} center={centerPosition} zoom={23} maxZoom={24}  >
+    <MapContainer style={{ height: '80vh' }} center={centerPosition} zoom={23} maxZoom={24}  >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 
       />
-      <GeoJSON data={mapData} />
+      <GeoJSON data={mapData as GeoJsonObject} />
       {labels.map(l => {
         const i = L.divIcon({
           className: 'label',

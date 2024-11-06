@@ -8,9 +8,7 @@ import { CustomizedBarChart } from '@/app/components/CustomBarChart';
 import { toPercentage } from '@/utils';
 import { CustomLineChart } from '@/app/components/CustomLineChart';
 import dayjsIsBetween from 'dayjs/plugin/isBetween'
-import Link from 'next/link'
 import { FootballItem } from '@/types';
-import { ItemType, MenuItemType } from 'antd/es/menu/interface';
 
 dayjs.extend(dayjsIsBetween)
 
@@ -29,18 +27,6 @@ const DATA_TYPE_OPTIONS = [
   { label: 'Raw', value: DataType.RAW },
   { label: 'Normalized', value: DataType.NORMALIZED },
 ];
-
-const ROUTES: ItemType<MenuItemType>[] = [
-  {
-    label: <Link href="/">Home</Link>,
-    type: 'group',
-    key: '/'
-  }, {
-    label: <Link href="/map">Map</Link>,
-    type: 'group',
-    key: '/map'
-  }
-]
 
 const DATE_RANGE_INDEX = {
   'START': 0,
@@ -111,31 +97,23 @@ export default function Home() {
   const yearlyAverageToUse = shouldDisplayRawData ? yearlyAverage : normalizedYearlyAverage
 
   return (
-    <Layout className='p-7 min-h-screen'>
 
-      <Menu
-        mode="horizontal"
-        defaultSelectedKeys={['1']}
-        items={ROUTES}
-      />
+    <>
+      <div className='mb-5'>
+        <RangePicker value={dateRange} onChange={setDateRange} className='mr-5' />
+        <Radio.Group options={DATA_TYPE_OPTIONS} onChange={e => setDataType(e.target.value)} value={dataType} optionType="button" />
+      </div>
+
+      <div className='mb-10'>
+        <Title level={3}>Daily Values:</Title>
+        <CustomizedBarChart yearlyMeanValue={yearlyAverageToUse} data={dataToShow} />
+      </div>
+
+      <Title level={4} className="mb-5">Trends:</Title>
+      <CustomLineChart data={dataToShow} />
+
+    </>
 
 
-      <Content>
-        <div className='my-5'>
-          <RangePicker value={dateRange} onChange={setDateRange} className='mr-5' />
-          <Radio.Group options={DATA_TYPE_OPTIONS} onChange={e => setDataType(e.target.value)} value={dataType} optionType="button" />
-        </div>
-
-        <div className='mb-10'>
-          <Title level={3}>Daily Values:</Title>
-          <CustomizedBarChart yearlyMeanValue={yearlyAverageToUse} data={dataToShow} />
-        </div>
-
-        <Title level={4} className="mb-5">Trends:</Title>
-        <CustomLineChart data={dataToShow} />
-
-      </Content>
-
-    </Layout>
   );
 }
