@@ -1,9 +1,7 @@
 import { COLOR } from "@/constants";
 import { FootballItem } from "@/types";
-import { BarProps, RectangleProps, Tooltip, Text } from "recharts";
-import { CartesianGrid, XAxis, YAxis, Legend, Bar, Rectangle, LineChart, CartesianGridProps, Line, BarChart } from 'recharts'
-import { ActiveShape } from "recharts/types/util/types";
-import { renderedLegend } from "./Chart";
+import { RectangleProps, Tooltip, Text } from "recharts";
+import { XAxis, YAxis, Legend, Bar, Rectangle, BarChart } from 'recharts'
 
 const createCustomBar = (yearlyMeanValue: number) => (props: RectangleProps) => {
   const { value } = props;

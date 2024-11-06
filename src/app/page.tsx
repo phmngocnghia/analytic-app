@@ -42,8 +42,6 @@ const ROUTES: ItemType<MenuItemType>[] = [
   }
 ]
 
-
-
 const DATE_RANGE_INDEX = {
   'START': 0,
   'END': 1
