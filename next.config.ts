@@ -5,7 +5,14 @@ const nextConfig: NextConfig = {
     turbo: {
       rules: {
         '*.csv': {
-          loaders: ['csv-loader'],
+          loaders: [{
+            loader: 'csv-loader',
+            options: {
+              dynamicTyping: true,
+              header: true,
+              skipEmptyLines: true
+            }
+          }],
           as: '*.js'
         },
       },
