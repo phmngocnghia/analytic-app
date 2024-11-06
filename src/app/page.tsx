@@ -13,61 +13,6 @@ dayjs.extend(dayjsIsBetween)
 
 
 
-// const maxValue = d.reduce(function (curMax, current) {
-
-//   return (curMax > current.value) ? curMax : current.value
-// }, 0)
-
-
-
-// const normalizedD = d.map(d => ({ time: d.time, value: toPercentage(d.value, max) }))
-// const yearlyMeanPercent = toPercentage(yearlyMeanValue, max)
-// // const yearlyMeanValue = footballCsv.reduce((totalValue, footballItem) => totalValue + Number(footballItem[1]), 0) / footballCsv.length
-
-
-// const ranges = [[]]
-// d.forEach(val => {
-//   const lastRange = ranges[ranges.length - 1]
-//   const firstElementOfLastRange = lastRange[0]
-
-
-//   // there's nothing to compare, create the first range
-//   if (!firstElementOfLastRange) {
-//     lastRange.push(val)
-//     return
-//   }
-
-//   const firstElementOfLastRangeValue = (firstElementOfLastRange.value)
-
-
-//   const isLastRangeSmallerThanYearlyMean = firstElementOfLastRangeValue < yearlyMeanValue
-
-//   if ((val[1]) < yearlyMeanValue) {
-//     if (isLastRangeSmallerThanYearlyMean) {
-//       lastRange.push(val)
-//     } else {
-//       ranges.push([val])
-//     }
-
-//     return
-//   }
-
-//   console.log(val[1], isLastRangeSmallerThanYearlyMean, yearlyMeanValue);
-
-//   // val >= mean D
-//   const isLastRangeBiggerThanyearlyMeanValueata = !isLastRangeSmallerThanYearlyMean
-//   if (isLastRangeBiggerThanyearlyMeanValueata) {
-//     lastRange.push(val)
-//   } else {
-//     ranges.push([val])
-//   }
-// })
-
-// console.log({ ranges });
-
-
-
-
 const { Content, Sider } = Layout;
 const { Title } = Typography
 
@@ -94,13 +39,15 @@ const ROUTES = [
 
 
 
-console.log('demo', dayjs().startOf('M'));
 
+/**
+ * suggestion to improve:
+ * move long execute code to worker thread to avoid blocking render
+ */
 export default function Home() {
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([dayjs().set('y', 2021).startOf('y'), dayjs().set('y', 2021).endOf('y')])
 
   const [dataType, setDataType] = useState<DataType>(DataType.RAW)
-  const [data, setData] = useState()
 
   const yearlyAverage = useMemo(() => {
     // in case user selects time range more than 2 years. e.g: filter time from 2020 -> 2021
@@ -124,15 +71,23 @@ export default function Home() {
       return dayjs(footballItem.Time).isBetween(dateRange[0], dateRange[1])
     }).map((footballItem) => {
       return {
+        // line red to override the red spot on the line chart when value < yearly value
         time: dayjs(footballItem.Time).format('DD/MM/YYYY'), value: footballItem.Value, lineRedValue: footballItem.Value < yearlyAverage ? footballItem.Value : undefined
       }
     })
   }, [dateRange])
 
+  const maxValue = useMemo(() => filteredData.reduce(function (curMax, item) {
+    return (curMax > item.value) ? curMax : item.value
+  }, 0), [filteredData])
 
+  // to be used when data type = 'raw'
+  const normalizedYearlyAverage = useMemo(() => toPercentage(yearlyAverage, maxValue), [yearlyAverage, maxValue])
+  const normalizedData = useMemo(() => filteredData.map(d => ({ time: d.time, value: toPercentage(d.value, maxValue), lineRedValue: typeof d.lineRedValue !== 'undefined' ? toPercentage(d.lineRedValue, maxValue) : undefined })), [filteredData],)
+  const shouldDisplayRawData = dataType === DataType.RAW
 
-
-
+  const dataToShow = shouldDisplayRawData ? filteredData : normalizedData
+  const yearlyAverageToUse = shouldDisplayRawData ? yearlyAverage : normalizedYearlyAverage
 
   return (
     <Layout className='p-7 min-h-screen'>
@@ -154,11 +109,11 @@ export default function Home() {
 
         <div className='mb-10'>
           <Title level={2}>Daily Values:</Title>
-          <CustomizedBarChart yearlyMeanValue={yearlyAverage} data={filteredData} />
+          <CustomizedBarChart yearlyMeanValue={yearlyAverageToUse} data={dataToShow} />
         </div>
 
         <Title level={2}>Trends:</Title>
-        <CustomLineChart data={filteredData} />
+        <CustomLineChart data={dataToShow} />
 
       </Content>
 
