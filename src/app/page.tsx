@@ -10,10 +10,11 @@ import { CustomLineChart } from '@/app/components/CustomLineChart';
 import dayjsIsBetween from 'dayjs/plugin/isBetween'
 import Link from 'next/link'
 import { FootballItem } from '@/types';
+import { ItemType, MenuItemType } from 'antd/es/menu/interface';
 
 dayjs.extend(dayjsIsBetween)
 
-const { Content, Sider } = Layout;
+const { Content } = Layout;
 const { Title } = Typography
 
 
@@ -29,11 +30,15 @@ const DATA_TYPE_OPTIONS = [
   { label: 'Normalized', value: DataType.NORMALIZED },
 ];
 
-const ROUTES = [
+const ROUTES: ItemType<MenuItemType>[] = [
   {
-    label: <Link href="/">Home</Link>
+    label: <Link href="/">Home</Link>,
+    type: 'group',
+    key: '/'
   }, {
-    label: <Link href="/map">Map</Link>
+    label: <Link href="/map">Map</Link>,
+    type: 'group',
+    key: '/map'
   }
 ]
 
@@ -74,10 +79,7 @@ export default function Home() {
     const yearlyItemsTotal = yearlyItems.reduce((totalValue, footballItem) => totalValue + Number(footballItem.value), 0)
     const yearlyAverage = yearlyItemsTotal / yearlyItems.length
     return yearlyAverage
-  }, [])
-
-
-
+  }, [dateRange])
 
   const filteredData = useMemo(() => {
     const formatFootballItem = (footballItem: FootballItem) => {
@@ -112,15 +114,13 @@ export default function Home() {
 
   return (
     <Layout className='p-7 min-h-screen'>
-      <Sider width={200} className="mr-5">
-        <Menu
-          mode="inline"
-          defaultSelectedKeys={['1']}
-          defaultOpenKeys={['sub1']}
-          style={{ height: '100%' }}
-          items={ROUTES}
-        />
-      </Sider>
+
+      <Menu
+        mode="horizontal"
+        defaultSelectedKeys={['1']}
+        items={ROUTES}
+      />
+
 
       <Content>
         <div className='my-5'>
@@ -129,11 +129,11 @@ export default function Home() {
         </div>
 
         <div className='mb-10'>
-          <Title level={2}>Daily Values:</Title>
+          <Title level={3}>Daily Values:</Title>
           <CustomizedBarChart yearlyMeanValue={yearlyAverageToUse} data={dataToShow} />
         </div>
 
-        <Title level={2}>Trends:</Title>
+        <Title level={4} className="mb-5">Trends:</Title>
         <CustomLineChart data={dataToShow} />
 
       </Content>

@@ -1,8 +1,9 @@
 import { COLOR } from "@/constants";
 import { FootballItem } from "@/types";
-import { BarProps, RectangleProps, Tooltip } from "recharts";
+import { BarProps, RectangleProps, Tooltip, Text } from "recharts";
 import { CartesianGrid, XAxis, YAxis, Legend, Bar, Rectangle, LineChart, CartesianGridProps, Line, BarChart } from 'recharts'
 import { ActiveShape } from "recharts/types/util/types";
+import { renderedLegend } from "./Chart";
 
 const createCustomBar = (yearlyMeanValue: number) => (props: RectangleProps) => {
   const { value } = props;
@@ -23,10 +24,17 @@ const createCustomBar = (yearlyMeanValue: number) => (props: RectangleProps) => 
 export const CustomizedBarChart = ({ data, yearlyMeanValue }: { data: FootballItem[], yearlyMeanValue: number }) => {
   const CustomBar = createCustomBar(yearlyMeanValue)
 
-  return (<BarChart width={1000} height={500} data={data}>
-    <XAxis label="Percent" dataKey={x => x.time} />
-    <YAxis label="Time" dataKey={x => x.value} type="number" allowDataOverflow /> />
+  return (<BarChart width={1000} height={600} data={data}>
+    <XAxis dataKey={x => x.time} />
+    <YAxis dataKey={x => x.value} type="number" allowDataOverflow /> />
     <Bar shape={CustomBar} dataKey={x => x.value} />
     <Tooltip />
+    <Legend payload={[{
+      value: 'Above Yearly Average',
+      color: COLOR.GREEN
+    }, {
+      value: 'Bellow Yearly Average',
+      color: COLOR.RED
+    }]} />
   </BarChart >)
 }

@@ -15,15 +15,15 @@ const position = [
 
 export default function MapWrapper() {
   return (
-    <div className='w-screen h-screen'>
-      <MapContainer style={{ height: '100vh' }} center={position} zoom={20} maxZoom={30}  >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 
-        />
-        <GeoJSON data={mapData} />
-      </MapContainer>
-    </div>
+    <MapContainer style={{ height: '100vh' }} center={position} zoom={20} maxZoom={30}  >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+
+      />
+      <GeoJSON data={mapData} />
+    </MapContainer>
+
   )
 }
