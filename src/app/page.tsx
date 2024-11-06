@@ -9,6 +9,7 @@ import { toPercentage } from '@/utils';
 import { CustomLineChart } from '@/app/components/CustomLineChart';
 import dayjsIsBetween from 'dayjs/plugin/isBetween'
 import Link from 'next/link'
+import { FootballItem } from '@/types';
 
 dayjs.extend(dayjsIsBetween)
 
@@ -38,6 +39,11 @@ const ROUTES = [
 
 
 
+const DATE_RANGE_INDEX = {
+  'START': 0,
+  'END': 1
+}
+
 
 /**
  * suggestion to improve:
@@ -49,31 +55,46 @@ export default function Home() {
   const [dataType, setDataType] = useState<DataType>(DataType.RAW)
 
   const yearlyAverage = useMemo(() => {
-    // in case user selects time range more than 2 years. e.g: filter time from 2020 -> 2021
-    const yearToFilters = [...new Set([dateRange[0].get('year'), dateRange[1].get('year')])]
+    let yearlyItems = footballCsv
+
+    // if no time is selected
+    if (dateRange?.length > 0) {
+      // in case user selects time range more than 2 years. e.g: filter time from 2020 -> 2021
+      const yearToFilters = [...new Set([dateRange[DATE_RANGE_INDEX.START].get('year'), dateRange[DATE_RANGE_INDEX.END].get('year')])]
 
 
-    const yearlyItems = footballCsv.filter(footbalItem => {
-      const footballItemYear = dayjs(footbalItem.Time).get('y')
-      return yearToFilters.includes(footballItemYear)
-    })
 
-    const yearlyItemsTotal = yearlyItems.reduce((totalValue, footballItem) => totalValue + Number(footballItem.Value), 0)
+      yearlyItems = footballCsv.filter(footbalItem => {
+        const footballItemYear = dayjs(footbalItem.time).get('y')
+        return yearToFilters.includes(footballItemYear)
+      })
+    }
+
+
+    const yearlyItemsTotal = yearlyItems.reduce((totalValue, footballItem) => totalValue + Number(footballItem.value), 0)
     const yearlyAverage = yearlyItemsTotal / yearlyItems.length
     return yearlyAverage
   }, [])
 
 
 
+
   const filteredData = useMemo(() => {
-    return footballCsv.filter((footballItem) => {
-      return dayjs(footballItem.Time).isBetween(dateRange[0], dateRange[1])
-    }).map((footballItem) => {
+    const formatFootballItem = (footballItem: FootballItem) => {
       return {
         // line red to override the red spot on the line chart when value < yearly value
-        time: dayjs(footballItem.Time).format('DD/MM/YYYY'), value: footballItem.Value, lineRedValue: footballItem.Value < yearlyAverage ? footballItem.Value : undefined
+        time: dayjs(footballItem.time).format('DD/MM/YYYY'), value: footballItem.value, lineRedValue: footballItem.value < yearlyAverage ? footballItem.value : undefined
       }
-    })
+    }
+
+    const shouldFilter = dateRange?.length > 0
+    if (!shouldFilter) {
+      return footballCsv.map(formatFootballItem)
+    }
+
+    return footballCsv.filter((footballItem) => {
+      return dayjs(footballItem.time).isBetween(dateRange[DATE_RANGE_INDEX.START], dateRange[DATE_RANGE_INDEX.END])
+    }).map(formatFootballItem)
   }, [dateRange])
 
   const maxValue = useMemo(() => filteredData.reduce(function (curMax, item) {
@@ -82,6 +103,7 @@ export default function Home() {
 
   // to be used when data type = 'raw'
   const normalizedYearlyAverage = useMemo(() => toPercentage(yearlyAverage, maxValue), [yearlyAverage, maxValue])
+  // line red to override the red spot on the line chart when value < yearly value
   const normalizedData = useMemo(() => filteredData.map(d => ({ time: d.time, value: toPercentage(d.value, maxValue), lineRedValue: typeof d.lineRedValue !== 'undefined' ? toPercentage(d.lineRedValue, maxValue) : undefined })), [filteredData],)
   const shouldDisplayRawData = dataType === DataType.RAW
 
