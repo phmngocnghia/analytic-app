@@ -1,6 +1,6 @@
 import { COLOR } from "@/constants";
 import { FootballItem } from "@/types";
-import { RectangleProps, Tooltip } from "recharts";
+import { CartesianGrid, RectangleProps, Tooltip } from "recharts";
 import { XAxis, YAxis, Legend, Bar, Rectangle, BarChart, ResponsiveContainer } from 'recharts'
 
 // any props is defined by recharts, we can't type it. We set display name when use the function
@@ -28,6 +28,7 @@ export const CustomizedBarChart = ({ data, yearlyMeanValue }: { data: FootballIt
   return (
     <ResponsiveContainer width="100%" height={600}>
       <BarChart data={data}>
+        <CartesianGrid stroke={COLOR.GRID_BORDER} strokeDasharray="5 5" />
         <XAxis dataKey={x => x.time} />
         <YAxis dataKey={x => x.value} type="number" allowDataOverflow />
         <Bar shape={<CustomBar />} dataKey={x => x.value} />

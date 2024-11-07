@@ -85,6 +85,8 @@ export default function Home() {
   const maxValue = useMemo(() => filteredData.reduce(function (curMax, item) {
     return (curMax > item.value) ? curMax : item.value
   }, 0), [filteredData])
+  console.log({ maxValue });
+
 
   // to be used when data type = 'raw'
   const normalizedYearlyAverage = useMemo(() => toPercentage(yearlyAverage, maxValue), [yearlyAverage, maxValue])
@@ -96,7 +98,6 @@ export default function Home() {
   const yearlyAverageToUse = shouldDisplayRawData ? yearlyAverage : normalizedYearlyAverage
 
   return (
-
     <>
       <div className='mb-5 flex flex-col sm:flex-row'>
         <RangePicker value={dateRange} onChange={setDateRange} className='mr-5' />
