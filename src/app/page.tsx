@@ -10,6 +10,7 @@ import { CustomLineChart } from '@/app/components/CustomLineChart';
 import dayjsIsBetween from 'dayjs/plugin/isBetween'
 import { FootballItem } from '@/types';
 import { ErrorBoundary } from '@/app/components/ErrorBoundary'
+import { DATA_TYPE_OPTIONS, DATE_RANGE_INDEX, } from './constants';
 
 dayjs.extend(dayjsIsBetween)
 
@@ -18,20 +19,7 @@ const { Title } = Typography
 
 const { RangePicker } = DatePicker;
 
-enum DataType {
-  RAW = 'RAW',
-  NORMALIZED = 'NORMALIZED'
-}
 
-const DATA_TYPE_OPTIONS = [
-  { label: 'Raw', value: DataType.RAW },
-  { label: 'Normalized', value: DataType.NORMALIZED },
-];
-
-const DATE_RANGE_INDEX = {
-  'START': 0,
-  'END': 1
-}
 
 
 /**
@@ -41,7 +29,7 @@ const DATE_RANGE_INDEX = {
 export default function Home() {
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>([dayjs().set('y', 2021).startOf('y'), dayjs().set('y', 2021).endOf('y')])
 
-  const [dataType, setDataType] = useState<DataType>(DataType.RAW)
+  const [dataType, setDataType] = useState<DataType>(DATA_TYPE_OPTIONS.RAW)
 
   const yearlyAverage = useMemo(() => {
     let yearlyItems = footballCsv

@@ -30,7 +30,7 @@ const checkLabelVisibility = (label: string, zoomLevel: number) => {
     return false
   }
 
-  if (zoomLevel > 20) {
+  if (zoomLevel > 18) {
     return true
   }
 
