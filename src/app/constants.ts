@@ -1,4 +1,4 @@
-enum DataType {
+export enum DataType {
   RAW = 'RAW',
   NORMALIZED = 'NORMALIZED'
 }
@@ -11,4 +11,9 @@ export const DATA_TYPE_OPTIONS = [
 export const DATE_RANGE_INDEX = {
   'START': 0,
   'END': 1
+}
+export enum COLOR {
+  GREEN = '#399918',
+  RED = '#FF7777',
+  GRID_BORDER = '#d6d6d6'
 }

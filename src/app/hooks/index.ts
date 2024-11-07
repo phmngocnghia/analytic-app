@@ -1,0 +1,1 @@
+export { useGetYearlyAverage } from './useGetYearlyAverage/useGetYearlyAverage'

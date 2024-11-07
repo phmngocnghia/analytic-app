@@ -1,7 +1,7 @@
-import { COLOR } from "@/constants";
 import { FootballItem } from "@/types";
 import { CartesianGrid, RectangleProps, Tooltip } from "recharts";
 import { XAxis, YAxis, Legend, Bar, Rectangle, BarChart, ResponsiveContainer } from 'recharts'
+import { COLOR } from "../constants";
 
 // any props is defined by recharts, we can't type it. We set display name when use the function
 // eslint-disable-next-line react/display-name 

@@ -1,7 +1,7 @@
-import { COLOR } from "@/constants"
 import { FootballItem } from "@/types"
 import { Tooltip } from "antd"
 import { LineChart, XAxis, YAxis, Line, Legend, ResponsiveContainer, CartesianGrid } from "recharts"
+import { COLOR } from "../constants"
 
 export const CustomLineChart = ({ data, yearlyAverage }: { data: FootballItem[], yearlyAverage: number }) => {
   return (

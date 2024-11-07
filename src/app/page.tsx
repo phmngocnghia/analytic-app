@@ -8,9 +8,10 @@ import { CustomizedBarChart } from '@/app/components/CustomBarChart';
 import { toPercentage } from '@/utils';
 import { CustomLineChart } from '@/app/components/CustomLineChart';
 import dayjsIsBetween from 'dayjs/plugin/isBetween'
-import { FootballItem } from '@/types';
+import { DateRange, FootballItem } from '@/types';
 import { ErrorBoundary } from '@/app/components/ErrorBoundary'
-import { DATA_TYPE_OPTIONS, DATE_RANGE_INDEX, } from './constants';
+import { DATA_TYPE_OPTIONS, DATE_RANGE_INDEX, DataType } from './constants';
+import { useGetYearlyAverage } from './hooks/useGetYearlyAverage/useGetYearlyAverage';
 
 dayjs.extend(dayjsIsBetween)
 
@@ -21,37 +22,16 @@ const { RangePicker } = DatePicker;
 
 
 
-
 /**
  * suggestion to improve:
  * move long execute code to worker thread to avoid blocking render
  */
 export default function Home() {
-  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>([dayjs().set('y', 2021).startOf('y'), dayjs().set('y', 2021).endOf('y')])
+  const [dateRange, setDateRange] = useState<DateRange>([dayjs().set('y', 2021).startOf('y'), dayjs().set('y', 2021).endOf('y')])
 
-  const [dataType, setDataType] = useState<DataType>(DATA_TYPE_OPTIONS.RAW)
+  const [dataType, setDataType] = useState<DataType>(DataType.RAW)
 
-  const yearlyAverage = useMemo(() => {
-    let yearlyItems = footballCsv
-
-    // if no time is selected
-    if (dateRange && dateRange.length > 0) {
-      // in case user selects time range more than 2 years. e.g: filter time from 2020 -> 2021
-      const yearToFilters = [...new Set([dateRange[DATE_RANGE_INDEX.START].get('year'), dateRange[DATE_RANGE_INDEX.END].get('year')])]
-
-
-
-      yearlyItems = footballCsv.filter(footbalItem => {
-        const footballItemYear = dayjs(footbalItem.time).get('y')
-        return yearToFilters.includes(footballItemYear)
-      })
-    }
-
-
-    const yearlyItemsTotal = yearlyItems.reduce((totalValue, footballItem) => totalValue + Number(footballItem.value), 0)
-    const yearlyAverage = yearlyItemsTotal / yearlyItems.length
-    return yearlyAverage
-  }, [dateRange])
+  const { yearlyAverage } = useGetYearlyAverage(dateRange)
 
   const filteredData = useMemo(() => {
     const formatFootballItem = (footballItem: FootballItem) => {
