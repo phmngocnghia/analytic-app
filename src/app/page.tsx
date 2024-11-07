@@ -12,7 +12,6 @@ import { FootballItem } from '@/types';
 
 dayjs.extend(dayjsIsBetween)
 
-const { Content } = Layout;
 const { Title } = Typography
 
 
@@ -111,9 +110,9 @@ export default function Home() {
 
       <Title level={4} className="mb-5">Trends:</Title>
       <CustomLineChart data={dataToShow} />
-
+      <div className='mt-20'>
+        123
+      </div>
     </>
-
-
   );
 }
