@@ -98,9 +98,9 @@ export default function Home() {
   return (
 
     <>
-      <div className='mb-5'>
+      <div className='mb-5 flex flex-col sm:flex-row'>
         <RangePicker value={dateRange} onChange={setDateRange} className='mr-5' />
-        <Radio.Group options={DATA_TYPE_OPTIONS} onChange={e => setDataType(e.target.value)} value={dataType} optionType="button" />
+        <Radio.Group options={DATA_TYPE_OPTIONS} onChange={e => setDataType(e.target.value)} value={dataType} optionType="button" className='mt-5 sm:mt-0' />
       </div>
 
       <div className='mb-10'>
