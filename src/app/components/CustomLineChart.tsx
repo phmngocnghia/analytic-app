@@ -3,7 +3,7 @@ import { FootballItem } from "@/types"
 import { Tooltip } from "antd"
 import { LineChart, XAxis, YAxis, Line, Legend, ResponsiveContainer, CartesianGrid } from "recharts"
 
-export const CustomLineChart = ({ data }: { data: FootballItem[] }) => {
+export const CustomLineChart = ({ data, yearlyAverage }: { data: FootballItem[], yearlyAverage: number }) => {
   return (
     <ResponsiveContainer width="100%" height={600}>
       <LineChart data={data}
@@ -19,7 +19,7 @@ export const CustomLineChart = ({ data }: { data: FootballItem[] }) => {
             return 'Above Yearly Average'
           }
 
-          return 'Bellow Yearly Average'
+          return `Bellow Yearly Average (${yearlyAverage})`
         }} />
       </LineChart>
     </ResponsiveContainer>

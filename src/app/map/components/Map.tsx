@@ -6,7 +6,7 @@ import mapData from '../../../data/office_geojson.json'
 import "leaflet/dist/leaflet.css";
 import { GeoJSON, MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet'
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 const centerPosition = new L.LatLng(
   48.115969,
@@ -70,7 +70,6 @@ const GeoLabel = () => {
 
 
 export default function MapWrapper() {
-
   return (
     <div>
       <MapContainer style={{ height: '80vh' }} center={centerPosition} zoom={23} maxZoom={24}    >

@@ -1,7 +1,7 @@
 "use client"
 import { Radio, Typography } from 'antd';
 import { DatePicker } from 'antd';
-import { useMemo, useState } from "react";
+import { startTransition, useMemo, useState } from "react";
 import footballCsv from '../data/football.csv'
 import dayjs, { Dayjs } from 'dayjs'
 import { CustomizedBarChart } from '@/app/components/CustomBarChart';
@@ -9,6 +9,7 @@ import { toPercentage } from '@/utils';
 import { CustomLineChart } from '@/app/components/CustomLineChart';
 import dayjsIsBetween from 'dayjs/plugin/isBetween'
 import { FootballItem } from '@/types';
+import { ErrorBoundary } from '@/app/components/ErrorBoundary'
 
 dayjs.extend(dayjsIsBetween)
 
@@ -38,7 +39,7 @@ const DATE_RANGE_INDEX = {
  * move long execute code to worker thread to avoid blocking render
  */
 export default function Home() {
-  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([dayjs().set('y', 2021).startOf('y'), dayjs().set('y', 2021).endOf('y')])
+  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>([dayjs().set('y', 2021).startOf('y'), dayjs().set('y', 2021).endOf('y')])
 
   const [dataType, setDataType] = useState<DataType>(DataType.RAW)
 
@@ -46,7 +47,7 @@ export default function Home() {
     let yearlyItems = footballCsv
 
     // if no time is selected
-    if (dateRange?.length > 0) {
+    if (dateRange && dateRange.length > 0) {
       // in case user selects time range more than 2 years. e.g: filter time from 2020 -> 2021
       const yearToFilters = [...new Set([dateRange[DATE_RANGE_INDEX.START].get('year'), dateRange[DATE_RANGE_INDEX.END].get('year')])]
 
@@ -72,7 +73,7 @@ export default function Home() {
       }
     }
 
-    const shouldFilter = dateRange?.length > 0
+    const shouldFilter = dateRange && dateRange?.length > 0
     if (!shouldFilter) {
       return footballCsv.map(formatFootballItem)
     }
@@ -85,7 +86,6 @@ export default function Home() {
   const maxValue = useMemo(() => filteredData.reduce(function (curMax, item) {
     return (curMax > item.value) ? curMax : item.value
   }, 0), [filteredData])
-  console.log({ maxValue });
 
 
   // to be used when data type = 'raw'
@@ -99,21 +99,32 @@ export default function Home() {
 
   return (
     <>
-      <div className='mb-5 flex flex-col sm:flex-row'>
-        <RangePicker value={dateRange} onChange={setDateRange} className='mr-5' />
-        <Radio.Group options={DATA_TYPE_OPTIONS} onChange={e => setDataType(e.target.value)} value={dataType} optionType="button" className='mt-5 sm:mt-0' />
-      </div>
+      <ErrorBoundary>
+        <div className='mb-5 flex flex-col sm:flex-row'>
+          <RangePicker value={dateRange} onChange={dateRange => {
+            startTransition(() => {
 
-      <div className='mb-10'>
-        <Title level={3}>Daily Values:</Title>
-        <CustomizedBarChart yearlyMeanValue={yearlyAverageToUse} data={dataToShow} />
-      </div>
+              setDateRange(dateRange as [Dayjs, Dayjs] | null)
+            })
+          }} className='mr-5' />
+          <Radio.Group options={DATA_TYPE_OPTIONS} onChange={e => setDataType(e.target.value)} value={dataType} optionType="button" className='mt-5 sm:mt-0' />
+        </div>
+      </ErrorBoundary>
 
-      <Title level={4} className="mb-5">Trends:</Title>
-      <CustomLineChart data={dataToShow} />
-      <div className='mt-20'>
-        123
-      </div>
+      <ErrorBoundary>
+        <div className='mb-10'>
+          <Title level={3}>Daily Values:</Title>
+          <CustomizedBarChart yearlyAverage={yearlyAverageToUse} data={dataToShow} />
+        </div>
+      </ErrorBoundary>
+
+      <ErrorBoundary>
+        <Title level={4} className="mb-5">Trends:</Title>
+        <CustomLineChart data={dataToShow} yearlyAverage={yearlyAverage} />
+        <div className='mt-20'>
+          123
+        </div>
+      </ErrorBoundary>
     </>
   );
 }
