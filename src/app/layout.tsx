@@ -36,7 +36,7 @@ export default function RootLayout({
             mode="horizontal"
             defaultSelectedKeys={['1']}
             items={ROUTES}
-            className="my-5"
+            className="mb-5"
           />
 
           <Content>{children}

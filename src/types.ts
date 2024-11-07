@@ -1,4 +1,4 @@
-export type FootballItem {
+export type FootballItem = {
   value: number,
   time: string
 }

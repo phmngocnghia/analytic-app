@@ -24,12 +24,22 @@ const labels = mapData.features.map(f => {
 })
 
 
+const checkLabelVisibility = (label: string, zoomLevel: number) => {
+  // Queue 1, 2 area is so small, we should hide it
+  if (['Queue 1', 'Queue 2'].includes(label) && zoomLevel < 22) {
+    return false
+  }
+
+  if (zoomLevel > 20) {
+    return true
+  }
+
+  return false
+
+}
 
 const GeoLabel = () => {
   const [zoomLevel, setZoomLevel] = useState(23);
-  const shouldShowLabel = useMemo(() => zoomLevel > 20, [zoomLevel])
-
-
 
   const mapEvents = useMapEvents({
     zoomend: () => {
@@ -38,20 +48,24 @@ const GeoLabel = () => {
   });
 
   // the polygon is very small to accommodate for label 
-  if (shouldShowLabel) {
-    return labels.map(l => {
+  return <>
+    {labels.map((l, index) => {
       const i = L.divIcon({
         className: 'label',
         html: l.name,
         iconSize: [100, 40]
       })
-      return (
-        <Marker position={l.coordinates} icon={i} />
-      )
-    })
-  }
 
-  return null
+      const shouldShowLabel = checkLabelVisibility(l.name, zoomLevel)
+      if (!shouldShowLabel) {
+        return
+      }
+
+      return (
+        <Marker key={`${l.name}_${index}`} position={l.coordinates} icon={i} />
+      )
+    }).filter(Boolean)}
+  </>
 }
 
 

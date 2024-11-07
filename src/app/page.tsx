@@ -1,6 +1,6 @@
 "use client"
 import { Radio, Typography } from 'antd';
-import { DatePicker, Layout, Menu } from 'antd';
+import { DatePicker } from 'antd';
 import { useMemo, useState } from "react";
 import footballCsv from '../data/football.csv'
 import dayjs, { Dayjs } from 'dayjs'
@@ -80,7 +80,7 @@ export default function Home() {
     return footballCsv.filter((footballItem) => {
       return dayjs(footballItem.time).isBetween(dateRange[DATE_RANGE_INDEX.START], dateRange[DATE_RANGE_INDEX.END])
     }).map(formatFootballItem)
-  }, [dateRange])
+  }, [dateRange, yearlyAverage])
 
   const maxValue = useMemo(() => filteredData.reduce(function (curMax, item) {
     return (curMax > item.value) ? curMax : item.value
@@ -89,7 +89,7 @@ export default function Home() {
   // to be used when data type = 'raw'
   const normalizedYearlyAverage = useMemo(() => toPercentage(yearlyAverage, maxValue), [yearlyAverage, maxValue])
   // line red to override the red spot on the line chart when value < yearly value
-  const normalizedData = useMemo(() => filteredData.map(d => ({ time: d.time, value: toPercentage(d.value, maxValue), lineRedValue: typeof d.lineRedValue !== 'undefined' ? toPercentage(d.lineRedValue, maxValue) : undefined })), [filteredData],)
+  const normalizedData = useMemo(() => filteredData.map(d => ({ time: d.time, value: toPercentage(d.value, maxValue), lineRedValue: typeof d.lineRedValue !== 'undefined' ? toPercentage(d.lineRedValue, maxValue) : undefined })), [filteredData, maxValue],)
   const shouldDisplayRawData = dataType === DataType.RAW
 
   const dataToShow = shouldDisplayRawData ? filteredData : normalizedData
